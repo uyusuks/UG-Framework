@@ -1,0 +1,28 @@
+{
+  "name": "u'g",
+  "tree": {
+    "$className": "DataModel",
+
+    "ReplicatedStorage": {
+      "Shared": {
+        "$path": "src/rs"
+      },
+
+      "Packages": {
+
+        "$path": "Packages"
+      }
+    },
+
+    "ServerScriptService": {
+      "Server": {
+        "$path": "src/sss"
+      },
+
+      "ServerPackages": {
+
+        "$path": "ServerPackages"
+      }
+    }
+  }
+}
