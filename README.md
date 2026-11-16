@@ -1,4 +1,4 @@
-# UG-Framework ~ [Uyusuk's-Guild]
+# UG-Framework ~ [Uyusuk's-Guild] !STILL DEPRICATED!
 
 ### --This repo based on an open-sourced guild framework that i did create from the begginin' if any questions/suggestions, dm on discord ".muriel."
 
