@@ -33,16 +33,21 @@ tcs.SendingMessage:Connect(function(input)
     if not input:IsA("Instance") then return end
 	
 	local _id = input.MessageId
-    local input = input.Text:lower()
+    local input = input.Text
+	
+	local _cmd, _req = input:match("^(/%S+)%s*(.*)")
 
 	for _, cmd in cmds do
-		
-        if input == cmd then
 
-			guild_e:FireServer({input = input, _id = _id})
+		if _cmd:lower() == cmd then
+
+			guild_e:FireServer({_cmd = _cmd:lower(), _req = _req, _id = _id})
         end
     end
 end)
+
+
+--@will prob move chat related events to the different env later,
 
 chat_e:OnEvent(function(data)
 
@@ -50,7 +55,7 @@ chat_e:OnEvent(function(data)
 
     local _op
 
-    if _req == "gcmdslist" then
+	if _req == "g_cmdlist" then
         
 		_op =
 			
@@ -60,7 +65,22 @@ chat_e:OnEvent(function(data)
 			"<font color='#E0E0E0' size='18'><i><b>/gcmds & /gcommands</b></i></font>\n" ..
 			"<font color='#E0E0E0' size='18'><i><b>/invite</b></i></font>\n" ..
 			"<font color='#E0E0E0' size='18'><i><b>/accept</b></i></font>\n" ..
-			"<font color='#E0E0E0' size='18'><i><b>/decline</b></i></font>\n"
+			"<font color='#E0E0E0' size='18'><i><b>/decline</b></i></font>"
+		
+	elseif _req == "g_inv" then
+		
+		local g_name = data.g_name
+
+		_op =
+
+			"<font color='#90EE90' size='18'><b><i>You got an invite from guild named, <font color='#FFFFFF'>" .. g_name:upper() .. "</font>.</i></b></font>\n" ..
+			"<font color='#E0E0E0' size='15'><i>&lt;got 30 secs of time to decide&gt;</i></font>"
+		
+	elseif _req == "g_invexp" then
+
+		_op =
+
+			"<font color='#E0E0E0' size='15'><i>&lt;the guild invitation expired&gt;</i></font>"
     end
 
     gch:DisplaySystemMessage(_op)
