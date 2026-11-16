@@ -1,5 +1,4 @@
 local sss = game:GetService("ServerScriptService")
-local ss = game:GetService("ServerStorage")
 local rs = game:GetService("ReplicatedStorage")
 local ps = game:GetService("Players")
 
@@ -12,14 +11,6 @@ local guild = require(_module:WaitForChild("Guild"))
 local netray = require(pkgs:WaitForChild("netray"))
 
 local guild_e = netray:RegisterEvent("guild_action")
-local chat_e = netray:RegisterEvent("chat_action")
-
-local is_gl = function(p)
-
-	local grank = profile._get(p, "grank")
-
-	if grank == 2 then return true end
-end
 
 local handled_ids = {}
 
@@ -35,55 +26,57 @@ guild_e:OnEvent(function(p, data)
 
 	handled_ids[_id] = true
 
-	local input = data.input
+	local _req = data._req
+	local _cmd = data._cmd
+	
+	if _cmd == prefix .. "gcmds" or _cmd == prefix .. "gcommands" then
 
-	local _, req = input:match("(%S+)%s*(.*)")
+		guild._listcommands(p)
 
-	if string.find(input, prefix .. "gcmds") or string.find(input, prefix .. "gcommands") then
+	elseif _cmd == prefix .. "crg" then
 
-		chat_e:FireClient(p, {_req = "gcmdslist"})
+		local g_name = _req
 
-	elseif string.find(input, prefix .. "crg") then
-
-		guild._create(p, req)
+		guild._create(p, g_name)
 
 		profile._set(p, "grank", 2)
-		profile._set(p, "guild", req)
+		profile._set(p, "guild", g_name)
 
-		local _guild = ss:WaitForChild("_guild")
-		local _grank = _guild:WaitForChild("_grank")
+	elseif _cmd == prefix .. "invite" then
 
-		local l_gl = _grank:WaitForChild("grank_2"):Clone()
+		if profile._get(p, "guild") == "" then return end
 
-		local ch = p.Character or p.CharacterAdded:Wait()
+		local g_name = profile._get(p, "guild")
+		
+		if not ps:FindFirstChild(_req) then return end
+		
+		local reciever = ps:FindFirstChild(_req)
+		
+		local rid = reciever.UserId
 
-		l_gl.Parent = ch
+		guild._invite(reciever, g_name, "fresh")
 
-	elseif string.find(input, prefix .. "inv") then
-
-		if profile._get(p, "guild") == "" or not is_gl(p) then return end
-
-		local req_guild = profile._get(p, "guild")
-		local req = ps:FindFirstChild(req)
-
-		guild._invite(req)
-
-		await_req["cd_" .. req.UserId] = true
-		await_req["guild_" .. req.UserId] = req_guild
+		await_req["cd_" .. rid] = true
+		await_req["guild_" .. rid] = g_name
 
 		task.delay(30, function()
 
-			await_req["cd_" .. req.UserId] = nil
-			await_req["guild_" .. req.UserId] = nil
+			await_req["cd_" .. rid] = nil
+			await_req["guild_" .. rid] = nil
+			
+			guild._invite(reciever, "expired")
 		end)
 
-	elseif string.find(input, prefix .. "accept") then
+	elseif _cmd == prefix .. "accept" then
+		
+		local reciever = p
+		local rid = reciever.UserId
+		
+		if not await_req["cd_" .. rid] then return end
 
-		if not await_req["cd_" .. p.UserId] then return end
+		local req_guild = await_req["guild_" .. rid]
 
-		local req_guild = await_req["guild_" .. p.UserId]
-
-		guild._accept(p, req_guild)
+		guild._accept(reciever, req_guild)
 	end
 
 	task.delay(10, function()
