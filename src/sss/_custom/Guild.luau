@@ -1,6 +1,5 @@
 local sss = game:GetService("ServerScriptService")
 local rs = game:GetService("ReplicatedStorage")
-local ps = game:GetService("Players")
 
 local pkgs = rs:WaitForChild("Packages")
 local s_pkgs = sss:WaitForChild("ServerPackages")
@@ -75,16 +74,23 @@ guild._set = function(p, req, rep_req)
 	guild_profile[req] = rep_req
 end
 
-guild._invite = function(req)
+guild._listcommands = function(p)
+	
+	chat_e:FireClient(p, {_req = "g_cmdlist"})
+end
 
-	chat_e:FireClient(req, {req = "guild_invite"})
+guild._invite = function(reciever, g_name, _type)
+
+	if _type ~= "fresh" then chat_e:FireClient(reciever, {_req = "g_invexp"}) return end
+	
+	chat_e:FireClient(reciever, {g_name = g_name, _req = "g_inv"})
 end
 
 guild._accept = function(p, rep_req)
 
-	guild.Value = string.sub(rep_req, 7)
-
-	chat_e:FireClient(p, {req = "guild_accept", guild_name = guild.Value})
+	--chat_e:FireClient(p, {_req = "guild_accept", g_name = @})
+	
+	return
 end
 
 guild._leave = function(p, rep_req)
