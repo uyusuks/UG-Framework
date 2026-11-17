@@ -1,5 +1,6 @@
 local sss = game:GetService("ServerScriptService")
 local rs = game:GetService("ReplicatedStorage")
+local ps = game:GetService("Players")
 
 local pkgs = rs:WaitForChild("Packages")
 local s_pkgs = sss:WaitForChild("ServerPackages")
@@ -13,81 +14,76 @@ local guild_store = p_store.New("guild", {
 
 	name = "",
 	experience = 0,
-	capacity = 0
+	capacity = 0,
+
+	members = {}
 })
 
 local guilds = {}
 
 local guild = {}
 
-guild._create = function(p, req_name)
+guild._create = function(p, g_name)
 
-	local uid = p.UserId
-
-	local guild = guild_store:StartSessionAsync("guild_" .. uid)
+	local guild = guild_store:StartSessionAsync("guild_" .. g_name)
 	local guild_profile = guild.Data
-	
-	guilds[uid] = guild_profile
-	
-	guild_profile["name"] = req_name
-	
+
+	guilds[g_name] = guild_profile
+
+	guild_profile["name"] = g_name
+
 	guild_profile["experience"] = 0
-	guild_profile["capacity"] = 0
+	guild_profile["capacity"] = 5
+
+	table.insert(guild_profile["members"], p.Name)
 end
 
-guild._load = function(p)
+guild._load = function(g_name)
 
-	local uid = p.UserId
-
-	local guild = guild_store:StartSessionAsync("guild_" .. uid)
+	local guild = guild_store:StartSessionAsync("guild_" .. g_name)
 	local guild_profile = guild.Data
 
-	guilds[uid] = guild_profile
+	guilds[g_name] = guild_profile
 end
 
-guild._end = function(p)
+guild._end = function(g_name)
 
-	local uid = p.UserId
-
-	local guild_profile = guilds[uid]
+	local guild_profile = guilds[g_name]
 
 	guild_profile:EndSession()
 end
 
-guild._get = function(p, req)
+--@access/replace properties inside of the guild
 
-	local uid = p.UserId
+guild._get = function(g_name, req) return guilds[g_name][req] end
 
-	local guild = guild_store:StartSessionAsync("guild_" .. uid)
-	local guild_profile = guild.Data
+guild._set = function(g_name, _req, r_req) guilds[g_name][_req] = r_req end
 
-	return guild_profile[req]
-end
+--@guild basic-functions
 
-guild._set = function(p, req, rep_req)
-
-	local uid = p.UserId
-
-	local guild = guild_store:StartSessionAsync("guild_" .. uid)
-	local guild_profile = guild.Data
-
-	guild_profile[req] = rep_req
-end
-
-guild._listcommands = function(p)
-	
-	chat_e:FireClient(p, {_req = "g_cmdlist"})
-end
-
-guild._invite = function(reciever, g_name, _type)
-
-	if _type ~= "fresh" then chat_e:FireClient(reciever, {_req = "g_invexp"}) return end
-	
-	chat_e:FireClient(reciever, {g_name = g_name, _req = "g_inv"})
-end
+guild._listcommands = function(p) chat_e:FireClient(p, {_req = "g_cmdlist"}) end
 
 guild._accept = function(p, g_name) chat_e:FireClient(p, {_req = "g_apt", g_name = g_name}) end
 
 guild._refuse = function(p, g_name) chat_e:FireClient(p, {_req = "g_ref", g_name = g_name}) end
+
+guild._invite = function(reciever, g_name, _type)
+
+	if _type ~= "fresh" then chat_e:FireClient(reciever, {_req = "g_invexp"}) return end
+
+	chat_e:FireClient(reciever, {g_name = g_name, _req = "g_inv"})
+end
+
+guild._chat = function(_p, g_name, _msg)
+
+	for _, member in guilds[g_name]["members"] do
+
+		if not ps:FindFirstChild(member) then continue end
+
+		local member = ps:FindFirstChild(member)
+
+		chat_e:FireClient(member, {_p = _p, g_name = g_name, _msg = _msg,  _req = "g_c"})
+	end
+end
 
 return guild
