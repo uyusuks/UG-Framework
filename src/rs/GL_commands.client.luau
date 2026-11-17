@@ -25,7 +25,7 @@ local cmds = {
     prefix .. "invite",
 
     prefix .. "accept",
-    prefix .. "leave"
+    prefix .. "refuse"
 }
 
 tcs.SendingMessage:Connect(function(input)
@@ -53,7 +53,11 @@ chat_e:OnEvent(function(data)
 
 	local _req = data._req
 
-    local _op
+	local _op
+	
+	local g_name
+	
+	if data.g_name then g_name = data.g_name end
 
 	if _req == "g_cmdlist" then
         
@@ -68,8 +72,6 @@ chat_e:OnEvent(function(data)
 			"<font color='#E0E0E0' size='18'><i><b>/decline</b></i></font>"
 		
 	elseif _req == "g_inv" then
-		
-		local g_name = data.g_name
 
 		_op =
 
@@ -81,6 +83,18 @@ chat_e:OnEvent(function(data)
 		_op =
 
 			"<font color='#E0E0E0' size='15'><i>&lt;the guild invitation expired&gt;</i></font>"
+		
+	elseif _req == "g_ref" then
+		
+		_op =
+
+			"<font color='#E0E0E0' size='15'><i>&lt;you did refuse invitation from, " .. g_name:upper() .. "&gt;</i></font>"
+		
+	elseif _req == "g_apt" then
+
+		_op =
+
+			"<font color='#E0E0E0' size='15'><i>&lt;you did accept invitation from, " .. g_name:upper() .. "&gt;</i></font>"
     end
 
     gch:DisplaySystemMessage(_op)
