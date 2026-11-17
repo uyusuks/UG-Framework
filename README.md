@@ -13,12 +13,12 @@
 `/refuse` --> [to refuse request thats already sent, has 30 secs of cooldown to decide]
 <br>
 `/accept` --> [to accept request thats already sent, has 30 secs of cooldown to decide]
+<br>
+`/gchat` --> [guild-only chat, communicate with other members in your guild]
 
 ### Incoming Perks;
 
 `/kick` --> [kick the target player thats inside of the current guild]
-<br>
-`/gchat` --> [guild-only chat]
 <br>
 <br>
 ...and more after gettin' these done,
