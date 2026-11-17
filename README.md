@@ -14,7 +14,7 @@
 <br>
 `/accept` --> [to accept request thats already sent, has 30 secs of cooldown to decide]
 <br>
-`/gchat` --> [guild-only chat, communicate with other members in your guild]
+`/gc & /gchat` --> [guild-only chat, communicate with other members in your guild]
 
 ### Incoming Perks;
 
