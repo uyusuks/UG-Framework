@@ -9,13 +9,13 @@
 `/crg` --> [creates guild with already set default-props]
 <br>
 `/invite` --> [to invite players to the current guild]
+<br>
+`/refuse` --> [to refuse request thats already sent, has 30 secs of cooldown to decide]
+<br>
+`/accept` --> [to accept request thats already sent, has 30 secs of cooldown to decide]
 
 ### Incoming Perks;
 
-`/decline` --> [to decline request thats already sent, has 30 secs of cooldown to decide]
-<br>
-`/accept` --> [to accept request thats already sent, has 30 secs of cooldown to decide]
-<br>
 `/kick` --> [kick the target player thats inside of the current guild]
 <br>
 `/gchat` --> [guild-only chat]
