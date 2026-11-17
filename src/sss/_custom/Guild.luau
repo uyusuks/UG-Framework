@@ -86,21 +86,8 @@ guild._invite = function(reciever, g_name, _type)
 	chat_e:FireClient(reciever, {g_name = g_name, _req = "g_inv"})
 end
 
-guild._accept = function(p, rep_req)
+guild._accept = function(p, g_name) chat_e:FireClient(p, {_req = "g_apt", g_name = g_name}) end
 
-	--chat_e:FireClient(p, {_req = "guild_accept", g_name = @})
-	
-	return
-end
-
-guild._leave = function(p, rep_req)
-
-	return
-end
-
-guild._kick = function(p, rep_req)
-
-	return
-end
+guild._refuse = function(p, g_name) chat_e:FireClient(p, {_req = "g_ref", g_name = g_name}) end
 
 return guild
