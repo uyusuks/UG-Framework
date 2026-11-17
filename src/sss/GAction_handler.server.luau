@@ -16,6 +16,8 @@ local handled_ids = {}
 
 local await_req = {}
 
+local request = {}
+
 local prefix = "/"
 
 guild_e:OnEvent(function(p, data)
@@ -44,39 +46,70 @@ guild_e:OnEvent(function(p, data)
 
 	elseif _cmd == prefix .. "invite" then
 
-		if profile._get(p, "guild") == "" then return end
+		if profile._get(p, "guild") == "" or profile._get(p, "grank") < 2 then return end
 
 		local g_name = profile._get(p, "guild")
-		
-		if not ps:FindFirstChild(_req) then return end
-		
-		local reciever = ps:FindFirstChild(_req)
-		
-		local rid = reciever.UserId
 
-		guild._invite(reciever, g_name, "fresh")
+		if not ps:FindFirstChild(_req) then return end
+
+		local receiver = ps:FindFirstChild(_req)
+
+		if profile._get(receiver, "guild") == _req then return end
+
+		local rid = receiver.UserId
+		
+		if request[rid] then return end
+		
+		request[rid] = true
+		
+		guild._invite(receiver, g_name, "fresh")
 
 		await_req["cd_" .. rid] = true
 		await_req["guild_" .. rid] = g_name
 
 		task.delay(30, function()
+			
+			if await_req["cd_" .. rid] == nil then return end
 
 			await_req["cd_" .. rid] = nil
 			await_req["guild_" .. rid] = nil
 			
-			guild._invite(reciever, "expired")
+			guild._invite(receiver, "expired")
+			
+			request[rid] = nil
 		end)
 
 	elseif _cmd == prefix .. "accept" then
-		
-		local reciever = p
-		local rid = reciever.UserId
-		
+
+		local receiver = p
+		local rid = receiver.UserId
+
 		if not await_req["cd_" .. rid] then return end
 
-		local req_guild = await_req["guild_" .. rid]
+		await_req["cd_" .. rid] = nil
+		request[rid] = nil
+		
+		local g_name = await_req["guild_" .. rid]
+		
+		await_req["guild_" .. rid] = nil
+		
+		guild._accept(receiver, g_name)
+		
+	elseif _cmd == prefix .. "refuse" then
+		
+		local receiver = p
+		local rid = receiver.UserId
 
-		guild._accept(reciever, req_guild)
+		if not await_req["cd_" .. rid] then return end
+		
+		await_req["cd_" .. rid] = nil
+		request[rid] = nil
+
+		local g_name = await_req["guild_" .. rid]
+
+		await_req["guild_" .. rid] = nil
+
+		guild._refuse(receiver, g_name)
 	end
 
 	task.delay(10, function()
