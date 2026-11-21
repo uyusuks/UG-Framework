@@ -1,5 +1,5 @@
 # UG-Framework ~ [Uyusuk's-Guild]
-## !!STILL DEPRICATED!! This project is fully broken, old and lacking assets to configure; so step by step i'll get it done fixin'/addin' stuff,
+
 ### --This repo based on an open-sourced guild framework that i did create from the begginin' if any questions/suggestions, dm on discord ".muriel."
 
 ### Available Perks;
